@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor Pro | Store</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #25d366; --dark: #0d0d0d; --card-bg: #ffffff; --text: #333; --accent: #007bff; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: #f0f2f5; color: var(--text); overflow-x: hidden; }
+
+        /* HEADER ESTILO LOJA */
+        header { background: var(--dark); color: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; }
+        .cart-badge { background: var(--primary); color: white; padding: 5px 12px; border-radius: 50px; cursor: pointer; font-weight: bold; }
+
+        /* SEÇÃO HERO (A FOTO DO EDITOR VAI AQUI) */
+        .hero { background: white; padding: 60px 5%; display: flex; align-items: center; justify-content: space-between; gap: 40px; flex-wrap: wrap; border-bottom: 1px solid #ddd; }
+        .hero-text { flex: 1; min-width: 300px; }
+        .hero-text h1 { font-size: 3rem; margin: 0; line-height: 1.1; }
+        .hero-text p { font-size: 1.2rem; color: #666; margin: 20px 0; }
+        .editor-img { width: 300px; height: 300px; border-radius: 50%; object-fit: cover; border: 10px solid #f0f2f5; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+
+        /* GRID DE PRODUTOS/SERVIÇOS */
+        .container { padding: 40px 5%; }
+        .section-title { text-align: left; font-size: 2rem; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .product-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; border: 1px solid #eee; }
+        .product-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+        .product-card img { width: 100%; height: 200px; object-fit: cover; }
+        .product-info { padding: 20px; }
+        .price { font-size: 1.5rem; font-weight: bold; color: var(--dark); margin: 10px 0; }
+        .btn-buy { background: var(--dark); color: white; border: none; width: 100%; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-buy:hover { background: var(--accent); }
+
+        /* BOTÃO WHATSAPP FLUTUANTE */
+        .wa-float { position: fixed; bottom: 30px; right: 30px; background: var(--primary); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 10px 20px rgba(37,211,102,0.3); z-index: 1000; text-decoration: none; transition: 0.3s; }
+        .wa-float:hover { transform: scale(1.1); }
+
+        /* CARRINHO SIDEBAR */
+        .sidebar { position: fixed; right: -400px; top: 0; width: 380px; height: 100%; background: white; z-index: 2000; transition: 0.4s; padding: 30px; box-sizing: border-box; box-shadow: -10px 0 30px rgba(0,0,0,0.1); }
+        .sidebar.active { right: 0; }
+        
+        @media (max-width: 768px) {
+            .hero { text-align: center; justify-content: center; }
+            .hero-text h1 { font-size: 2.2rem; }
+            .sidebar { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">VIDEO<span style="color:var(--primary)">STORE</span></div>
+    <div class="cart-badge" onclick="toggleCart()">
+        <i class="fas fa-shopping-bag"></i> <span id="cart-count">0</span>
+    </div>
+</header>
+
+<section class="hero">
+    <div class="hero-text">
+        <h1 id="hero-title">Transformo seus brutos em vídeos virais.</h1>
+        <p id="hero-desc">Editor profissional com foco em retenção e engajamento para criadores modernos.</p>
+        <button onclick="window.location.href='#servicos'" class="btn-buy" style="width: auto; padding: 15px 30px;">Ver Serviços</button>
+    </div>
+    <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=500" alt="Editor de Vídeo" class="editor-img">
+</section>
+
+<div class="container" id="servicos">
+    <h2 class="section-title"><i class="fas fa-bolt"></i> Nossos Planos</h2>
+    <div class="product-grid" id="product-list">
+        </div>
+</div>
+
+<div id="cart-sidebar" class="sidebar">
+    <h2>Seu Carrinho</h2>
+    <input type="text" id="client-name" placeholder="Seu Nome Completo" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #ddd; border-radius:8px;">
+    <div id="cart-items-list" style="margin-bottom: 20px;"></div>
+    <div style="font-size: 1.4rem; font-weight: bold; margin-bottom: 20px;">Total: <span class="curr">R$</span> <span id="total-price">0</span></div>
+    <button class="btn-buy" style="background:var(--primary); padding: 15px;" onclick="checkout()">Finalizar Pedido via WhatsApp</button>
+    <p onclick="toggleCart()" style="text-align: center; color: #999; cursor: pointer; margin-top: 15px;">Continuar Comprando</p>
+</div>
+
+<a href="https://wa.me/5511999999999" class="wa-float" target="_blank">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+<script>
+    // --- "PAINEL DE ADMIN" SIMPLIFICADO ---
+    // Edite as informações abaixo para mudar o conteúdo do site sem mexer no HTML
+    const config = {
+        phone: "5511999999999",
+        currency: "R$",
+        services: [
+            { id: 1, name: "Pack 5 Reels Virais", price: 450, img: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400", desc: "Legendas dinâmicas, cortes rápidos e SFX." },
+            { id: 2, name: "Edição YouTube (Até 15min)", price: 300, img: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400", desc: "Color grade, trilha sonora e tratamento de áudio." },
+            { id: 3, name: "VSL de Alta Conversão", price: 800, img: "https://images.unsplash.com/photo-1492724441997-5dc865305da7?w=400", desc: "Foco total em vendas e copywriting visual." }
+        ]
+    };
+
+    let cart = [];
+
+    // Renderizar Produtos
+    function renderProducts() {
+        const list = document.getElementById('product-list');
+        list.innerHTML = config.services.map(s => `
+            <div class="product-card">
+                <img src="${s.img}" alt="${s.name}">
+                <div class="product-info">
+                    <h3>${s.name}</h3>
+                    <p>${s.desc}</p>
+                    <div class="price">${config.currency} ${s.price}</div>
+                    <button class="btn-buy" onclick="addToCart(${s.id})">Adicionar ao Carrinho</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function addToCart(id) {
+        const item = config.services.find(s => s.id === id);
+        cart.push({...item, cartId: Date.now()});
+        updateCart();
+        if(window.innerWidth > 768) toggleCart(true); // Abre o carrinho automaticamente no PC
+    }
+
+    function removeFromCart(cartId) {
+        cart = cart.filter(i => i.cartId !== cartId);
+        updateCart();
+    }
+
+    function updateCart() {
+        const list = document.getElementById('cart-items-list');
+        const count = document.getElementById('cart-count');
+        const total = document.getElementById('total-price');
+        
+        count.innerText = cart.length;
+        let sum = 0;
+        list.innerHTML = cart.map(item => {
+            sum += item.price;
+            return `
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
+                    <div><strong>${item.name}</strong><br><small>${config.currency} ${item.price}</small></div>
+                    <button onclick="removeFromCart(${item.cartId})" style="border:none; color:red; background:none; cursor:pointer;">Remover</button>
+                </div>
+            `;
+        }).join('');
+        total.innerText = sum;
+    }
+
+    function checkout() {
+        const name = document.getElementById('client-name').value;
+        if(!name) return alert("Por favor, digite seu nome!");
+        if(cart.length === 0) return alert("Carrinho vazio!");
+
+        let msg = `*Novo Pedido - ${name}*\n\n`;
+        cart.forEach(i => msg += `• ${i.name} - ${config.currency}${i.price}\n`);
+        msg += `\n*Total: ${config.currency}${document.getElementById('total-price').innerText}*`;
+        
+        window.open(`https://wa.me/${config.phone}?text=${encodeURIComponent(msg)}`);
+    }
+
+    function toggleCart(forceOpen = false) {
+        const sb = document.getElementById('cart-sidebar');
+        if(forceOpen) sb.classList.add('active');
+        else sb.classList.toggle('active');
+    }
+
+    renderProducts();
+</script>
+
+</body>
+</html>
